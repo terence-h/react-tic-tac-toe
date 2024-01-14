@@ -1,37 +1,32 @@
-import { useState } from "react";
-
 const initialGrid = [
 	[null, null, null],
 	[null, null, null],
 	[null, null, null],
 ];
 
-export default function GameBoard({ onSelectSquare, activePlayerSymbol }) {
-    const [gameBoard, setGameBoard] = useState(initialGrid);
+export default function GameBoard({ onSelectCell, turns }) {
+	let gameBoard = initialGrid;
 
-    function onSelectCell(rowIndex, colIndex) {
-        setGameBoard((prevGameBoard) => {
-            // Instead of mutating the original nested array, we will create deep copy by spreading the nested array into a new object.
-            // If we were to update the old value directly, this will be done BEFORE the scheduled state update by React. It will causes bugs
-            // if there are multiple places that are scheduling state updates for the same state.
-            const updatedBoard = [...prevGameBoard.map(row => [...row])];
-            updatedBoard[rowIndex][colIndex] = activePlayerSymbol;
-            return updatedBoard;
-        });
+	// This will not run if turns is empty, therefore the initial game board will be used instead.
+	for (const turn of turns) {
+		// We can destructure the object to allow us to easily set the game board's grid.
+		const { cell, player } = turn;
+		const { row, col } = cell;
 
-        // This function is defined in the App component
-        onSelectSquare();
-    }
-    
+		gameBoard[row][col] = player;
+	}
+
 	return (
-        // Map every row then followed each individual grid in each row to generate the tic tac toe game board.
+		// Map every row then followed each individual grid in each row to generate the tic tac toe game board.
 		<ol id="game-board">
 			{gameBoard.map((row, rowIndex) => (
 				<li key={rowIndex}>
 					<ol>
 						{row.map((playerSymbol, colIndex) => (
 							<li key={colIndex}>
-								<button onClick={() => onSelectCell(rowIndex, colIndex)}>{playerSymbol}</button>
+								<button onClick={() => onSelectCell(rowIndex, colIndex)}>
+									{playerSymbol}
+								</button>
 							</li>
 						))}
 					</ol>
