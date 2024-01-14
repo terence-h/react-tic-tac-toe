@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-export default function Player({ initialName, symbol, isActive, onNameChanged }) {
+export default function Player({
+	initialName,
+	symbol,
+	isActive,
+	onNameChanged,
+}) {
 	// Used to determined whether React needs to reexecute this component to update the contents.
 	const [playerName, setPlayerName] = useState(initialName);
 	const [isEditing, setIsEditing] = useState(false);
