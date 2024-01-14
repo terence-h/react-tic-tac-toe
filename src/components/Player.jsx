@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Player({ initialName, symbol, isActive }) {
+export default function Player({ initialName, symbol, isActive, onNameChanged }) {
 	// Used to determined whether React needs to reexecute this component to update the contents.
 	const [playerName, setPlayerName] = useState(initialName);
 	const [isEditing, setIsEditing] = useState(false);
@@ -11,6 +11,10 @@ export default function Player({ initialName, symbol, isActive }) {
 		// e.g. doing setIsEditing(!isEditing) will schedule a state update but does not happen immediately.
 		// This will be an issue if we want to use isEditing again in this function which will return the old state value.
 		setIsEditing((editing) => !editing);
+
+		if (isEditing) {
+			onNameChanged(symbol, playerName);
+		}
 	}
 
 	function onPlayerNameChanged(event) {

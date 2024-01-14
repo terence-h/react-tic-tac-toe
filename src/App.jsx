@@ -2,23 +2,17 @@ import { useState } from "react";
 import GameBoard from "./components/GameBoard";
 import Player from "./components/Player";
 import Log from "./components/Log";
-
-function GetActivePlayer(gameTurns) {
-	let currentPlayer = "X";
-
-	// Since tic tac toe is a turn based game, we can assume that based on the previous turn (if exist)
-	// will change to the other player's turn.
-	if (gameTurns.length > 0 && gameTurns[0].player === "X") {
-		currentPlayer = "O";
-	}
-
-	return currentPlayer;
-}
+import GameOver from "./components/GameOver";
+import * as HelperFunctions from "./HelperFunctions.js";
 
 function App() {
+	const [players, setPlayers] = useState(HelperFunctions.PLAYERS);
 	const [gameTurns, setGameTurns] = useState([]);
 
-	const activePlayer = GetActivePlayer(gameTurns);
+	const activePlayer = HelperFunctions.GetActivePlayer(gameTurns);
+	const gameBoard = HelperFunctions.GetGameBoard(gameTurns);
+	const winner = HelperFunctions.GetWinner(gameBoard, players);
+	const isDraw = gameTurns.length === 9 && !winner;
 
 	// This function is here as both Player and GameBoard component rely on it.
 	// Player: requires to set the active player CSS class.
@@ -28,12 +22,25 @@ function App() {
 			const updatedTurns = [
 				{
 					cell: { row: rowIndex, col: colIndex },
-					player: GetActivePlayer(prevTurns),
+					player: HelperFunctions.GetActivePlayer(prevTurns),
 				},
 				...prevTurns,
 			];
 
 			return updatedTurns;
+		});
+	}
+
+	function restartGame() {
+		setGameTurns([]);
+	}
+
+	function onPlayerNameChanged(symbol, newName) {
+		setPlayers((prevPlayers) => {
+			return {
+				...prevPlayers,
+				[symbol]: newName,
+			};
 		});
 	}
 
@@ -43,17 +50,22 @@ function App() {
 				{/* Players info */}
 				<ol id="players" className="highlight-player">
 					<Player
-						initialName="Player 1"
+						initialName={HelperFunctions.PLAYERS.X}
 						symbol="X"
 						isActive={activePlayer === "X"}
+						onNameChanged={onPlayerNameChanged}
 					/>
 					<Player
-						initialName="Player 2"
+						initialName={HelperFunctions.PLAYERS.O}
 						symbol="O"
 						isActive={activePlayer === "O"}
+						onNameChanged={onPlayerNameChanged}
 					/>
 				</ol>
-				<GameBoard onSelectCell={onSelectCellCallback} turns={gameTurns} />
+				{(winner || isDraw) && (
+					<GameOver winner={winner} onRestart={restartGame} />
+				)}
+				<GameBoard onSelectCell={onSelectCellCallback} board={gameBoard} />
 			</div>
 			<Log turns={gameTurns} />
 		</main>
