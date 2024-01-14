@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Player({ initialName, symbol }) {
+export default function Player({ initialName, symbol, isActive }) {
     // Used to determined whether React needs to reexecute this component to update the contents.
     const [playerName, setPlayerName] = useState(initialName);
 	const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +25,7 @@ export default function Player({ initialName, symbol }) {
 	);
 
 	return (
-		<li>
+		<li className={isActive ? "active" : undefined}>
 			<span className="player">
 				{playerNameContainer}
 				<span className="player-symbol">{symbol}</span>
